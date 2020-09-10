@@ -1,0 +1,35 @@
+[
+  {
+    "portMappings": [
+      {
+        "hostPort": 0,
+        "protocol": "tcp",
+        "containerPort": 3000
+      }
+    ],
+    "command": null,
+    "linuxParameters": null,
+    "cpu": 0,
+    "environment": null,
+    "dockerSecurityOptions": null,
+    "memory": 256,
+    "memoryReservation": null,
+    "volumesFrom": [],
+    "image": "${image_uri}",
+    "name": "${service_name}",
+    "secrets": [
+      {
+        "name": "NODE_ENV",
+        "valueFrom": "${NODE_ENV}"
+      },
+      {
+        "name": "MONGODB_URI",
+        "valueFrom": "${MONGODB_URI}"
+      },
+      {
+        "name": "SECRET",
+        "valueFrom": "${SECRET}"
+      }            
+    ]
+  }
+]
