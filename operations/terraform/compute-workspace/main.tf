@@ -92,7 +92,5 @@ module "ecs_service" {
 # }
 
 output "grand_finale" {
-  value = "${concat(
-    "s3_bucket_name - ", module.frontend.aws_s3_bucket, "\t\n", "aws_ecr_repository - ", module.ecs_service.aws_ecr_repository
-  )}"
+  value = ["s3_bucket_name ↓ ", module.frontend.aws_s3_bucket, "aws_ecr_repository ↓ ", module.ecs_service.aws_ecr_repository]
 }
