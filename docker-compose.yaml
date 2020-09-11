@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+    frontend:
+        build: ./frontend
+        image: hillel-project-frontend
+        ports:
+            - "8070:80"
+
+    backend:
+        build: ./backend
+        image: hillel-project-backend
+        depends_on:
+            - "database"
+        environment:
+            - NODE_ENV=production
+            - MONGODB_URI=mongodb://database/conduit
+            - SECRET='very secret string'
+        ports:
+            - "12345:3000"
+        # networks:
+        #     - backend
+    
+    database:
+        image: mongo
+        expose:
+            - "27017"
+        volumes: 
+            - dbvol:/data/db
+        # networks:
+        #     - backend
+volumes: 
+    dbvol:
+networks:
+    backend:
