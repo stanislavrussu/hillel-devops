@@ -84,13 +84,20 @@ module "ecs_service" {
 #  value = module.ecs_service.aws_ecr_repository
 # }
 
-# output "main" {
+# output "grand_finale_1" {
 #  value = list(values({
 #   s3_bucket_name     = module.frontend.aws_s3_bucket
 #   aws_ecr_repository = module.ecs_service.aws_ecr_repository
 #  }))
 # }
 
-output "grand_finale" {
-  value = ["s3_bucket_name ↓ ", module.frontend.aws_s3_bucket, "aws_ecr_repository ↓ ", module.ecs_service.aws_ecr_repository]
+# output "grand_finale_2" {
+#  value = ["s3_bucket_name ↓ ", module.frontend.aws_s3_bucket, "aws_ecr_repository ↓ ", module.ecs_service.aws_ecr_repository]
+# }
+
+output "grand_finale_3" {
+  value = {
+    "s3_bucket_name"     = module.frontend.aws_s3_bucket
+    "aws_ecr_repository" = module.ecs_service.aws_ecr_repository
+  }
 }
