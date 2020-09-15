@@ -1,0 +1,62 @@
+// # FRONTEND
+pipeline {
+    agent any
+    parameters {
+        string(name: 'FE_S3_Bucket', defaultValue: 'S3 Bucket Name')
+        string(name: 'CF_DIST_ID', defaultValue: 'CloudFront Distribution ID')
+    }
+    stages {
+        stage("Checkout"){
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    userRemoteConfigs: [[
+                        url: 'git@github.com:stanislavrussu/hillel-devops.git',
+                        credentialsId: 'afdec061-5369-4f8c-97af-dce540697f09'
+                    ]]
+                ])
+            }
+        }    
+        stage("Build"){ 
+            agent {
+                docker {
+                    image 'node:12'
+                    reuseNode true
+                }
+            }
+            steps {
+                dir('frontend') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }        
+        stage("Deploy"){
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args '--entrypoint=""'
+                }
+            }
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY',
+                    credentialsId: 'aws_creds'
+                ]]) {
+                        sh """
+                        aws s3 sync ./frontend/build/ s3://hw22russu
+                        aws cloudfront create-invalidation --distribution-id E3M4HM138B5A3U --paths "/*"
+                        """
+                    }
+            }
+        }
+    }
+//  post{
+//      always{
+//          cleanWs()
+//      }
+//  }
+}
