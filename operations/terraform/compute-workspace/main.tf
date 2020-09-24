@@ -1,6 +1,7 @@
 provider "aws" {
-  profile = var.profile
-  region  = var.region
+  # profile = var.profile
+  # region  = var.region
+  region = "us-east-1"
 }
 
 data "terraform_remote_state" "certificate" {
@@ -11,6 +12,7 @@ data "terraform_remote_state" "certificate" {
     workspaces = {
       name = "assets"
     }
+    token = var.remote_state_token
   }
 }
 
@@ -29,47 +31,48 @@ data "terraform_remote_state" "certificate" {
 
 module "vpc" {
   source   = "./modules/vpc"
-  vpc_cidr = var.vpc_cidr
-  tags     = var.tags
+  vpc_cidr = data.aws_ssm_parameter.vpc_cidr.value
+  tags     = jsondecode(replace(data.aws_ssm_parameter.tags.value, "=", ":"))
 }
 
 module "frontend" {
   source = "./modules/frontend"
   # arn         = module.certificate.acm_certificate_arn
-  arn         = data.terraform_remote_state.certificate.outputs.acm_certificate_arn
-  domain_name = var.domain_name
+  arn            = data.terraform_remote_state.certificate.outputs.acm_certificate_arn
+  s3_bucket_name = data.aws_ssm_parameter.s3_bucket_name.value
+  domain_name    = data.aws_ssm_parameter.domain_name.value
   # depends_on  = [module.certificate]
 }
 
 module "ecs_cluster" {
   source          = "./modules/ecs_cluster"
-  cluster_name    = replace(var.domain_name, ".", "-") #just fooling around with functions ^_^
-  tags            = var.tags
-  instance_type   = var.instance_type
+  cluster_name    = replace(data.aws_ssm_parameter.domain_name.value, ".", "-") #just fooling around with functions ^_^
+  tags            = jsondecode(replace(data.aws_ssm_parameter.tags.value, "=", ":"))
+  instance_type   = data.aws_ssm_parameter.instance_type.value
   ec2_sg_list     = module.vpc.ec2_sg_list
   subnets_id_list = module.vpc.subnets_id_list
-  public_key      = var.public_key
+  public_key      = data.aws_ssm_parameter.public_key.value
 }
 
 module "lb" {
   source = "./modules/lb"
   # acm_certificate_arn = module.certificate.acm_certificate_arn
   acm_certificate_arn = data.terraform_remote_state.certificate.outputs.acm_certificate_arn
-  lb_name             = replace(var.domain_name, ".", "-")
+  lb_name             = replace(data.aws_ssm_parameter.domain_name.value, ".", "-")
   alb_sg_list         = module.vpc.alb_sg_list
   subnets_id_list     = module.vpc.subnets_id_list
-  domain_name         = var.domain_name
-  tags                = var.tags
+  domain_name         = data.aws_ssm_parameter.domain_name.value
+  tags                = jsondecode(replace(data.aws_ssm_parameter.tags.value, "=", ":"))
 }
 
 module "ecs_service" {
   source           = "./modules/ecs_service"
-  service_name     = var.service_name
+  service_name     = data.aws_ssm_parameter.service_name.value
   ecs_cluster_name = module.ecs_cluster.ecs_cluster_name
   ecs_cluster_arn  = module.ecs_cluster.ecs_cluster_arn
   alb_listener_arn = module.lb.alb_listener_arn
   vpc_id           = module.vpc.vpc_id
-  # tags             = var.tags
+  # tags           = var.tags
 }
 
 # output instance_pub_ips {
