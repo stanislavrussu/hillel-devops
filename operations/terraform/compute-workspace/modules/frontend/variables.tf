@@ -21,7 +21,3 @@ variable "domain_name" {
   type    = string
   default = "stanislav.tiab.tech"
 }
-
-variable "id" {
-  type    = string
-}
