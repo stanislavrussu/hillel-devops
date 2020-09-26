@@ -25,7 +25,3 @@ data "aws_ssm_parameter" "public_key" {
 data "aws_ssm_parameter" "service_name" {
   name = "/${var.GIT_BRANCH}/ECS_SERVICE_NAME"
 }
-
-data "aws_ssm_parameter" "id" {
-  name = "/${var.GIT_BRANCH}/CF_DIST_ID"
-}
