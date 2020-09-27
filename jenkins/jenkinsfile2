@@ -1,0 +1,94 @@
+// FINALE
+pipeline{
+    agent any
+    parameters {
+      choice(
+        name: 'BRANCH',
+        choices: ['', 'master'],
+        description: 'Select BRANCH name to provision'
+      )
+    }
+    stages{
+        stage("Checkout Infrastructure Code"){
+            steps{
+                checkout([
+                    $class: 'GitSCM',
+                    userRemoteConfigs: [[
+                        url: 'git@github.com:stanislavrussu/hillel-devops.git',
+                        credentialsId: '2d98bdbf-ae8d-4eec-b6ae-4312b8c789d5'
+                    ]],
+                    extensions: [[
+                      $class: 'SparseCheckoutPaths',
+                      sparseCheckoutPaths: [[
+                        path: 'operations/terraform/compute-workspace'
+                      ]]
+                    ]]
+                ])
+            }
+        }
+
+        stage("Build Infrastructure"){  
+          when {
+            expression {
+              params.BRANCH != ''
+            }
+            beforeOptions true
+          }                
+              agent {
+                docker {
+                  image 'hashicorp/terraform:0.13.3'
+                  args '--entrypoint=""'
+                  reuseNode true
+                }
+              }
+            steps{
+              dir('operations/terraform/compute-workspace') {
+                withCredentials([
+                  [
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                    credentialsId: 'aws_creds', 
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                  ],
+                  string(variable: 'TF_CLOUD_TOKEN', credentialsId: 'terraform_cloud')
+                ]) {
+                    sh """
+                    terraform init -input=false -no-color -compact-warnings \
+                    -backend-config=token=${env.TF_CLOUD_TOKEN}
+                    
+                    terraform apply -auto-approve -input=false -no-color -compact-warnings \
+                    -var remote_state_token="${env.TF_CLOUD_TOKEN}" -var GIT_BRANCH=${params.BRANCH}
+                    """
+                }
+              }
+            }
+        }
+        stage("Deploy App"){
+          when {
+            expression {
+              params.BRANCH != ''
+            }
+            beforeOptions true
+          }  
+          input {
+              message "Create the infra?"
+            }
+            parallel {
+              stage("Deploy Frontend"){
+                steps {
+                  build(
+                    job: "hillel-devops-frontend/${params.BRANCH}"
+                    )
+                }
+              }                        
+              stage("Deploy Backend"){
+                  steps{
+                  build(
+                    job: "hillel-devops-backend/${params.BRANCH}"
+                    )                      
+                  }
+                } 
+            }          
+        }
+    }
+}
