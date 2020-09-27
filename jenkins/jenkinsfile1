@@ -1,4 +1,4 @@
-// # FRONTEND
+// FRONTEND
 pipeline {
     agent any
     parameters {
