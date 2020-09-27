@@ -99,3 +99,9 @@ resource "aws_route53_record" "that" {
     evaluate_target_health = true
   }
 }
+
+resource "aws_ssm_parameter" "CF_DIST_ID" {
+  name  = "/master/CF_DIST_ID"
+  type  = "String"
+  value = aws_cloudfront_distribution.this.id
+}
