@@ -25,3 +25,15 @@ data "aws_ssm_parameter" "public_key" {
 data "aws_ssm_parameter" "service_name" {
   name = "/${var.GIT_BRANCH}/ECS_SERVICE_NAME"
 }
+
+data "aws_ssm_parameter" "MONGODB_URI" {
+  name = "/${var.GIT_BRANCH}/MONGODB_URI"
+}
+
+data "aws_ssm_parameter" "NODE_ENV" {
+  name = "/${var.GIT_BRANCH}/NODE_ENV"
+}
+
+data "aws_ssm_parameter" "SECRET" {
+  name = "/${var.GIT_BRANCH}/SECRET"
+}
