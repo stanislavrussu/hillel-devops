@@ -33,17 +33,17 @@ data "aws_iam_role" "ecs_service_role" {
   name = "AWSServiceRoleForECS"
 }
 
-data "aws_ssm_parameter" "MONGODB_URI" {
-  name = "MONGODB_URI"
-}
-
-data "aws_ssm_parameter" "NODE_ENV" {
-  name = "NODE_ENV"
-}
-
-data "aws_ssm_parameter" "SECRET" {
-  name = "SECRET"
-}
+# data "aws_ssm_parameter" "MONGODB_URI" {
+#  name = "MONGODB_URI"
+#}
+#
+#data "aws_ssm_parameter" "NODE_ENV" {
+#  name = "NODE_ENV"
+#}
+#
+#data "aws_ssm_parameter" "SECRET" {
+#  name = "SECRET"
+#}
 
 resource "aws_ecs_task_definition" "this" {
   family = var.service_name
@@ -51,9 +51,9 @@ resource "aws_ecs_task_definition" "this" {
     {
       "image_uri"    = aws_ecr_repository.this.repository_url,
       "service_name" = var.service_name,
-      "MONGODB_URI"  = data.aws_ssm_parameter.MONGODB_URI.arn,
-      "NODE_ENV"     = data.aws_ssm_parameter.NODE_ENV.arn,
-      "SECRET"       = data.aws_ssm_parameter.SECRET.arn
+      "MONGODB_URI"  = var.mongodburi,
+      "NODE_ENV"     = var.nodeenv,
+      "SECRET"       = var.secret
     }
   )
   execution_role_arn = aws_iam_role.task_execution_role.arn
