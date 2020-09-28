@@ -21,3 +21,15 @@ variable "service_name" {
 # variable "tags" {
 #   type = map(string)
 # }
+
+variable "mongodburi" {
+  type = string
+}
+
+variable "nodeenv" {
+  type = string
+}
+
+variable "secret" {
+  type = string
+}
