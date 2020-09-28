@@ -72,6 +72,9 @@ module "ecs_service" {
   ecs_cluster_arn  = module.ecs_cluster.ecs_cluster_arn
   alb_listener_arn = module.lb.alb_listener_arn
   vpc_id           = module.vpc.vpc_id
+  mongodburi       = data.aws_ssm_parameter.MONGODB_URI.arn
+  nodeenv          = data.aws_ssm_parameter.NODE_ENV.arn
+  secret           = data.aws_ssm_parameter.SECRET.arn
   # tags           = var.tags
 }
 
