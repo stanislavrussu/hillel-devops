@@ -1,6 +1,6 @@
 variable "s3_bucket_name" {
-  type        = string
-  default     = "hw22russu"
+  type = string
+  # default     = "hw22russu"
   description = "S3 bucket to be used for static webhosting"
 }
 
@@ -20,4 +20,8 @@ variable "arn" {
 variable "domain_name" {
   type    = string
   default = "stanislav.tiab.tech"
+}
+
+variable "GIT_BRANCH" {
+  type = string
 }
