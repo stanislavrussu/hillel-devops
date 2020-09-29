@@ -1,4 +1,4 @@
-// FRONTEND
+// frontend
 pipeline {
     agent any
     parameters {
