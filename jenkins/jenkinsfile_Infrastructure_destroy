@@ -63,12 +63,12 @@ pipeline{
             }
         }
         stage("Deploy App"){
-//          when {
-//            expression {
-//              params.BRANCH != ''
-//            }
-//            beforeOptions true
-//          }  
+          when {
+            expression {
+              params.BRANCH != ''
+            }
+            beforeOptions true
+          }  
 //          input {
 //              message "Create the infra?"
 //            }
