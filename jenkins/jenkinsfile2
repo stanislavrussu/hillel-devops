@@ -27,12 +27,12 @@ pipeline{
         }
 
         stage("Build Infrastructure"){  
-//          when {
-//            expression {
-//              params.BRANCH != ''
-//            }
-//            beforeOptions true
-//          }                
+          when {
+            expression {
+              params.BRANCH != ''
+            }
+            beforeOptions true
+          }                
               agent {
                 docker {
                   image 'hashicorp/terraform:0.13.3'
