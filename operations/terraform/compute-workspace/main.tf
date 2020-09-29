@@ -41,6 +41,7 @@ module "frontend" {
   arn            = data.terraform_remote_state.certificate.outputs.acm_certificate_arn
   s3_bucket_name = data.aws_ssm_parameter.s3_bucket_name.value
   domain_name    = data.aws_ssm_parameter.domain_name.value
+  GIT_BRANCH     = var.GIT_BRANCH
   # depends_on  = [module.certificate]
 }
 
