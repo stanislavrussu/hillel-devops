@@ -25,7 +25,13 @@ pipeline{
                 ])
             }
         }
-        stage("Destroy Infrastructure"){                 
+        stage("Destroy Infrastructure"){
+          when {
+            expression {
+              params.BRANCH != ''
+            }
+            beforeOptions true
+          } 
               agent {
                 docker {
                   image 'hashicorp/terraform:0.13.3'
